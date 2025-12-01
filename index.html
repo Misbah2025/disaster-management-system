@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1e40af',
+                        'secondary-yellow': '#fde047', 
+                        'accent-red': '#dc2626', 
+                        'bg-light': '#f3f4f6', 
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 min-h-screen font-sans">
+  <header class="bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow-lg">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold">Disaster Management System</h1>
+      <button onclick="scrollToRelief()" class="bg-white text-indigo-600 px-4 py-2 rounded hover:bg-indigo-700 hover:text-white transition">
+        Relief Allocation
+      </button>
+    </div>
+  </header>
+
+
+    <main class="container mx-auto p-6">
+
+        <section id="path-finder" class="mb-12 bg-white p-6 rounded-xl shadow-2xl">
+            <h2 class="text-2xl font-extrabold text-primary-blue mb-4 text-center border-b-2 pb-2">
+               Detect the obstacle to find the shortest way
+            </h2>
+
+            <div id="red-zone-map" class="relative w-full h-96 border-4 border-accent-red p-4 rounded-lg bg-secondary-yellow/30">
+                <svg id="map-edges" class="absolute inset-0 w-full h-full pointer-events-none"></svg>
+
+                <div id="node-sylhet" class="location-node absolute top-[5%] left-[70%]">Sylhet</div>
+                <div id="node-sunamganj" class="location-node absolute top-[15%] left-[55%]">Sunamganj</div>
+                <div id="node-moulvibazar" class="location-node absolute top-[25%] left-[70%]">Moulvibazar</div>
+                <div id="node-habiganj" class="location-node absolute top-[35%] left-[55%]">Habiganj</div>
+                <div id="node-netrokona" class="location-node absolute top-[20%] left-[30%]">Netrokona</div>
+                <div id="node-noakhali" class="location-node absolute top-[55%] left-[60%]">Noakhali</div>
+                <div id="node-bhola" class="location-node absolute top-[75%] left-[45%]">Bhola</div>
+                <div id="node-khagrachari" class="location-node absolute top-[65%] left-[75%]">Khagrachari</div>
+                <div id="node-bandarban" class="location-node absolute top-[85%] left-[65%]">Bandarban</div>
+                <div id="node-rangamati" class="location-node absolute top-[75%] left-[85%]">Rangamati</div>
+                
+            </div>
+
+            
+           
+            <div class="flex flex-col md:flex-row gap-4 mt-6 items-center justify-center">
+    <select id="start-node" class="p-3 border border-gray-300 rounded-lg shadow-md focus:ring-primary-blue focus:border-primary-blue w-full md:w-1/4">
+        <option value="">-- Select Starting Node --</option>
+    </select>
+    
+    <select id="end-node" class="p-3 border border-gray-300 rounded-lg shadow-md focus:ring-primary-blue focus:border-primary-blue w-full md:w-1/4">
+        <option value="">-- Select Ending Node --</option>
+    </select>
+
+    <button id="find-path-btn" class="bg-primary-blue text-white py-3 px-8 rounded-lg font-semibold shadow-md transition duration-300 hover:bg-blue-700 hover:shadow-xl w-full md:w-auto">
+        Find Shortest Path
+    </button>
+</div>
+            
+            <div id="path-result" class="mt-4 p-4 bg-primary-blue/10 border-l-4 border-primary-blue rounded-lg font-medium hidden">
+                </div>
+        </section>
+        
+        <section id="allocator" class="bg-white p-6 rounded-xl shadow-2xl">
+            <h2 class="text-2xl font-extrabold text-primary-blue mb-6 text-center border-b-2 pb-2">
+                Relief Item Allocation 
+            </h2>
+
+<form id="item-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <input type="text" id="item-name" placeholder="Item Name "  class="input-field md:col-span-1 col-span-1 w-full">
+                <input type="number" id="item-weight" placeholder="Weight (kg)" class="input-field w-full" min="1">
+                <input type="number" id="item-value" placeholder="Value (Priority 1-10)" class="input-field w-full" min="1" max="10">
+                <input type="number" id="item-quantity" placeholder="Quantity Available" class="input-field w-full" min="1">
+                
+                <button type="button" id="add-item-btn" class="md:col-span-4 col-span-1 bg-green-600 text-white py-3 rounded-lg font-semibold shadow-md transition duration-300 hover:bg-green-700 hover:shadow-xl w-full">
+                    Add Item
+                </button>
+            </form>
+
+            <h3 class="text-xl font-bold text-gray-700 mb-3">Truck Capacity & Allocation</h3>
+            <div class="flex flex-col md:flex-row gap-4 mb-6">
+                <input type="number" id="truck-capacity" placeholder="Truck Max Capacity (Weight in kg)" class="input-field flex-grow" min="1">
+                
+                <button type="button" id="allocate-items-btn" class="bg-accent-red text-white py-3 px-8 rounded-lg font-semibold shadow-md transition duration-300 hover:bg-red-700 hover:shadow-xl flex-shrink-0">
+                    Allocate Items
+                </button>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Available Relief Items:</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead class="bg-primary-blue text-white">
+                        <tr>
+                            <th class="py-2 px-4 border-b">Item</th>
+                            <th class="py-2 px-4 border-b">Type</th>
+                            <th class="py-2 px-4 border-b">Weight(kg)</th>
+                            <th class="py-2 px-4 border-b">Value</th>
+                            <th class="py-2 px-4 border-b">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="item-table-body">
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="allocation-result" class="mt-6 p-4 bg-green-500/10 border-l-4 border-green-600 rounded-lg font-medium hidden">
+                <h4 class="text-lg font-bold text-green-700 mb-2">✅ Maximum Items to Carry:</h4>
+                <div id="best-items-details">
+                    </div>
+            </div>
+
+        </section>
+        <script>
+    function scrollToRelief() {
+      document.getElementById("allocator").scrollIntoView({ behavior: "smooth" });
+    }
+    </script>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
